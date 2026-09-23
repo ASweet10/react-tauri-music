@@ -1,28 +1,41 @@
 import { useState, useEffect } from 'react'
-import { invoke } from '@tauri-apps/api/core'
 import { type Deck } from './types/flashcard'
 import Metrics from './components/Metrics'
-import ActivityGraph from './components/ActivityGraph'
+import { ActivityMatrix } from './components/ActivityMatrix'
 import ActionBubbles from './components/ActionBubbles'
-import DeckModal from './components/CreateDeckModal'
+import DeckModal from './components/DeckModal'
+import coolCat from './assets/coolcat.jpg'
 
 
 export default function App() {
   const [decks, setDecks] = useState<Deck[]>([])
   const [deckModalOpen, setDeckModalOpen] = useState(false)
 
-  const fetchDecks = async() => {
-    try {
-      const loadedDecks = await invoke<Deck[]>('get_decks')
-      setDecks(loadedDecks)
-    } catch(error) {
-      console.error('deck loading from rust failed:', error)
-    }
-  }
-
   useEffect(() => {
+    async function fetchDecks() {
+      const cached = localStorage.getItem('decks')
+      if (cached) {
+        try {
+          setDecks(JSON.parse(cached))
+          return
+        } catch(error) {
+          console.error('deck loading from localStorage failed:', error)
+        }
+      }
+    }
+
     fetchDecks()
   }, [])
+
+  const saveDecks = (updatedDecks: Deck[]) => {
+    setDecks(updatedDecks)
+    localStorage.setItem('decks', JSON.stringify(updatedDecks))
+  }
+
+  const deleteDeck = (deletedIndex: Deck["id"]) => {
+    const updatedDecks = decks.filter((_, index) => index.toString() !== deletedIndex)
+    setDecks(updatedDecks)
+  }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center">
@@ -30,7 +43,7 @@ export default function App() {
       <div className="w-full max-w-5xl px-4 sm:px-6 lg:px-8 py-8 flex flex-col gap-8">
         <ActionBubbles onClose={() => setDeckModalOpen(true)} />
         <Metrics />
-        <ActivityGraph />
+        <ActivityMatrix />
 
         {/* Deck Grid Section */}
         <section className="flex flex-col gap-4">
@@ -43,22 +56,14 @@ export default function App() {
                 {/* Thumbnail Image */}
                 <div className="h-36 w-full overflow-hidden bg-slate-800 relative">
                   <img 
-                    src={deck.imageUrl} 
+                    src={deck.imageUrl || coolCat} 
                     alt={deck.title} 
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" 
                   />
                   
-                  {/* Hover Quick Action Buttons */}
                   <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button 
-                      className="p-1.5 bg-slate-900/80 hover:bg-slate-900 text-slate-200 rounded-md backdrop-blur-sm transition-colors"
-                      title="Edit Deck"
-                    >
-                      ✏️
-                    </button>
-                    <button 
-                      className="p-1.5 bg-slate-900/80 hover:bg-red-900/80 text-red-300 rounded-md backdrop-blur-sm transition-colors"
-                      title="Delete Deck"
+                    <button title="Delect Deck" onClick={() => deleteDeck(deck.id)}
+                      className="p-1.5 bg-slate-900/80 hover:bg-red-900/80 text-red-300 rounded-md backdrop-blur-sm transition-colors cursor-pointer"
                     >
                       🗑️
                     </button>
@@ -85,7 +90,7 @@ export default function App() {
         {deckModalOpen && (
           <DeckModal 
             onClose={() => setDeckModalOpen(false)}
-            onDeckCreated={(updatedDecks) => setDecks(updatedDecks)}
+            onDeckCreated={(updatedDecks) => saveDecks(updatedDecks)}
           />
         )}
       </div>

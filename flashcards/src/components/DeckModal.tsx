@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { type Card, type Deck } from '../types/flashcard'
 import { invoke } from '@tauri-apps/api/core'
-import CreateCardModal from './CreateCardModal'
+import CreateCardModal from './CardModal'
 import { pickImageFromDisk } from '../utils/utils'
 import coolCat from '../assets/coolcat.jpg'
 
@@ -13,7 +13,7 @@ interface DeckModalProps {
 export default function DeckModal({ onClose, onDeckCreated }: DeckModalProps) {
     // Deck state
     const [deckTitle, setDeckTitle] = useState('')
-    const [deckImageUrl, setDeckImageUrl] = useState(coolCat)
+    const [deckImageUrl, setDeckImageUrl] = useState('')
     const [cards, setCards] = useState<Card[]>([])
     const [cardModalOpen, setCardModalOpen] = useState(false)
 
@@ -105,11 +105,10 @@ export default function DeckModal({ onClose, onDeckCreated }: DeckModalProps) {
                     ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
                         {cards.map((card, idx) => (
-                        <div key={card.id} className="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden flex flex-col">
-                            <img src={card.imageUrl} alt={card.id} className="h-28 w-full object-cover bg-slate-900" />
+                        <div key={card.id} onClick={() => setCardModalOpen(true)} className="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden flex flex-col cursor-pointer">
+                            <img src={card.imageUrl || coolCat} alt={card.id} className="h-28 w-full object-cover bg-slate-900" />
                             <div className="p-3">
-                            <span className="text-xs text-amber-500 font-bold"># {idx + 1}</span>
-                            <p className="text-xs font-medium text-slate-200 mt-0.5 line-clamp-2">{card.question.slice(0, 30)}</p>
+                                <p className="text-xs font-medium text-slate-200 mt-0.5 line-clamp-2">{card.question.slice(0, 30)}</p>
                             </div>
                         </div>
                         ))}

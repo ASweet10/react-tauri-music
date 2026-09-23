@@ -7,11 +7,26 @@
   ],
   "permissions": [
     "core:default",
-    "dialog:allow-open"
+    "dialog:default",
+    "dialog:allow-open",
+    "core:path:default",
+    "core:event:default"
   ],
   "app": {
     "security": {
-      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
+      "csp": "default-src 'self' ipc: http://ipc.localhost; img-src 'self' asset: http://asset.localhost blob: data:",
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "allow": [
+            "$DOCUMENT/**",
+            "$DOWNLOAD/**",
+            "$PICTURES/**",
+            "$PUBLIC/**"
+          ]
+        }
+      }
     }
   }
+
 }

@@ -9,7 +9,7 @@ interface CardModalProps {
     cards: Card[]
 }
 
-export default function CreateCardModal ({ onClose, onCardCreated, cards }: CardModalProps) {
+export default function CardModal ({ onClose, onCardCreated, cards }: CardModalProps) {
     const [cardQuestion, setCardQuestion] = useState('')
     const [cardAnswer, setCardAnswer] = useState('')
     const [cardImageUrl, setCardImageUrl] = useState('')

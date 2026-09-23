@@ -9,13 +9,12 @@ const ActionBubbles = ({ onClose }: ActionBubblesProps) => {
   return (
     <header className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
         <div>
-        <h1 className="text-3xl font-extrabold text-amber-400 tracking-tight">Flashcard Studio</h1>
-        <p className="text-sm text-slate-400">Personal Study Dashboard</p>
+            <h1 className="text-3xl font-extrabold text-amber-800 tracking-tight">Flashcard Studio</h1>
         </div>
 
         <div className="flex flex-wrap gap-2">
         <button onClick={onClose}
-            className="px-4 py-2 bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-semibold rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+            className="px-4 py-2 bg-amber-800 hover:bg-amber-700 text-slate-950 text-sm font-semibold rounded-full shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
         >
             <span>+</span> Create Deck
         </button>
