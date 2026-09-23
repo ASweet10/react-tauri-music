@@ -6,6 +6,12 @@
     "main"
   ],
   "permissions": [
-    "core:default"
-  ]
+    "core:default",
+    "dialog:allow-open"
+  ],
+  "app": {
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost"
+    }
+  }
 }

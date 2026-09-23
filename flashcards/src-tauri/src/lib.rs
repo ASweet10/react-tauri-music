@@ -1,7 +1,5 @@
 // Main entry point; Rust commands exposed to frontend
 use serde::{Deserialize, Serialize};
-use std::fs;
-use std::path::Path;
 use std::sync::Mutex;
 use tauri::State;
 
@@ -9,12 +7,13 @@ use tauri::State;
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Card {
   pub id: String,
-  pub title: String,
+  pub question: String,
+  pub answer: String,
   pub image_url: String,
 }
 
 // Deck containing flashcard array
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Deck {
   pub id: String,
   pub title: String,
@@ -50,11 +49,11 @@ fn create_deck(payload: CreateDeckPayload, state: State<'_, AppState>,) -> Resul
       "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=500&q=80".to_string()
     } else {
       payload.image_url
-    }
+    },
     cards: payload.cards,
-  }
+  };
 
-  decks.push(new_deck)
+  decks.push(new_deck);
   Ok(decks.clone())
 }
 
@@ -71,16 +70,10 @@ fn get_decks(state: State<'_, AppState>) -> Result<Vec<Deck>, String> {
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
   tauri::Builder::default()
-    .setup(|app| {
-      if cfg!(debug_assertions) {
-        app.handle().plugin(
-          tauri_plugin_log::Builder::default()
-            .level(log::LevelFilter::Info)
-            .build(),
-        )?;
-      }
-      Ok(())
+    .manage(AppState {
+      decks: Mutex::new(vec![]),
     })
+    .plugin(tauri_plugin_dialog::init())
     .invoke_handler(tauri::generate_handler![create_deck, get_decks])
     .run(tauri::generate_context!())
     .expect("error while running tauri application");
