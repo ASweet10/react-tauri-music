@@ -1,4 +1,3 @@
-# Flashcard Studio
 - React
 - Rust
 - Tauri V2
