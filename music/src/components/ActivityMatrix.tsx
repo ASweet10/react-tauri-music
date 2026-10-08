@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import { useMemo } from 'react'
 
 interface ActivityMatrixProps {
   activityData?: Record<string, number>;

@@ -4,6 +4,8 @@ import { invoke } from '@tauri-apps/api/core'
 import CreateCardModal from './CardModal'
 import { pickImageFromDisk } from '../utils/utils'
 import coolCat from '../assets/coolcat.jpg'
+import { Button } from './ui/Button'
+import { Input } from './ui/Input'
 
 interface DeckModalProps {
     onClose: () => void
@@ -63,9 +65,7 @@ export default function DeckModal({ onClose, onDeckCreated }: DeckModalProps) {
 
                         <div>
                             <label className="block font-bold text-slate-400 mb-1">Title</label>
-                            <input type="text" value={deckTitle} onChange={(e) => setDeckTitle(e.target.value)}
-                                className="w-full bg-slate-900 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-amber-500"
-                            />
+                            <Input inputValue={deckTitle} onChange={(e) => setDeckTitle(e.target.value)} />
                         </div>
 
                         <div>
@@ -85,12 +85,15 @@ export default function DeckModal({ onClose, onDeckCreated }: DeckModalProps) {
                         <hr className="border-slate-800 my-2" />
 
                         <button
-                        type="button"
-                        onClick={() => setCardModalOpen(true)}
-                        className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-bold rounded-lg shadow-md transition-all cursor-pointer"
+                            type="button"
+                            onClick={() => setCardModalOpen(true)}
+                            className="w-full py-2.5 bg-amber-500 hover:bg-amber-400 text-slate-950 text-sm font-bold rounded-lg shadow-md transition-all cursor-pointer"
                         >
-                        + Add New Card
+                            + Add New Card
                         </button>
+                        <Button >
+                            + Add New Card
+                        </Button>
                     </div>
 
                 {/* Card Gallery */}
