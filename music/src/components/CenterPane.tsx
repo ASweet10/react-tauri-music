@@ -1,11 +1,11 @@
 import { Heart,  } from 'lucide-react'
-import { type MusicTrack } from '../types/Music'
+import { type Track } from '../store/usePlayerStore'
 
 interface CenterPaneProps {
-    currentTrack: MusicTrack
+    currentTrack: Track
 }
 
-const CenterPane = ({ currentTrack }: CenterPaneProps) => {
+const CenterPane = () => {
   return (
     <main className="flex-1 bg-neutral-900 rounded-lg overflow-y-auto flex flex-col">
         {/* Spotify-style Header Section */}

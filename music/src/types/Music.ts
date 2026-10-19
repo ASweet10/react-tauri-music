@@ -1,14 +1,6 @@
-export interface MusicTrack {
-  id: string;
-  artist: string;
-  title: string;
-  album: string;
-  durationSeconds: number;
-  artPath: string;
-  musicPath: string;
-}
+import { type Track } from "../store/usePlayerStore"
 
 export interface MusicPlaylist {
-  title?: string;
-  items: MusicTrack[];
+  title?: string
+  items: Track[]
 }
