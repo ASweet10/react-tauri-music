@@ -3,7 +3,7 @@ import React from 'react'
 const RightSidebar = () => {
   return (
     <aside className="w-80 bg-neutral-900 rounded-lg p-4 flex flex-col gap-4 overflow-y-auto">
-        <h2 className="font-bold text-sm text-neutral-400">Now Playing</h2>
+        <h2 className="font-bold text-sm text-neutral-400">CurrentGenreOrPlaylistNameHere</h2>
         <div className="w-full aspect-square bg-neutral-800 rounded-md border border-neutral-700 flex items-center justify-center">
             {/* Large Current Song Art */}
             <span className="text-neutral-500">Track Art</span>

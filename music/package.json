@@ -11,9 +11,11 @@
   "dependencies": {
     "@tauri-apps/api": "^2.11.1",
     "@tauri-apps/plugin-dialog": "^2.7.3",
+    "@tauri-apps/plugin-sql": "^2.6.0",
     "lucide-react": "^1.53.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "tauri": "^0.15.0",
     "zustand": "^5.0.15"
   },
   "devDependencies": {

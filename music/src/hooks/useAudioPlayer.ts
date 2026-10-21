@@ -8,6 +8,7 @@ export function useAudioPlayer() {
     const isPlaying = usePlayerStore((state) => state.isPlaying)
     const volume = usePlayerStore((state) => state.volume)
     const isMuted = usePlayerStore((state) => state.isMuted)
+    const currentTime = usePlayerStore((state) => state.currentTime)
     const setCurrentTime = usePlayerStore((state) => state.setCurrentTime)
     const nextTrack = usePlayerStore((state) => state.nextTrack)
 
@@ -74,6 +75,18 @@ export function useAudioPlayer() {
 
         audio.volume = isMuted ? 0 : volume
     }, [volume, isMuted])
+
+    // Sync explicit seeks (Clicking seek bar)
+    useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    // If state is reset to 0, seek the audio element back to start
+    if (audio.currentTime === 0 && audio.currentTime !== 0) {
+        audio.currentTime = 0;
+        if (isPlaying) audio.play().catch(console.error);
+    }
+    }, [currentTime, isPlaying]);
 
     return { audioRef }
 }

@@ -1,13 +1,39 @@
 import { create } from "zustand"
 
+export type MainView =
+    | { type: 'ALL_TRACKS' }
+    | { type: 'GENRE'; genreName: string }
+    | { type: 'ALBUM'; albumName: string }
+    | { type: 'ARTIST'; artistName: string }
+
+
+/* Sorting Type - Left Sidebar */
+export interface GenreSummary {
+    name: string
+    albumCount: number
+    trackCount: number
+    coverArtUrl?: string
+}
+export interface AlbumSummary {
+    name: string
+    genre: string
+    coverArtUrl?: string
+}
+export interface ArtistSummary {
+    name: string
+    albumCount: number
+    coverArtUrl?: string
+}
+
 export interface Track {
     id: string
     title: string
     artist: string
     album: string
+    genre: string
     duration: number
     filePathOrUrl: string
-    artPathOrUrl: string
+    coverArtUrl?: string
 }
 
 export type RepeatMode = 'off' | 'all' | 'one'
@@ -23,6 +49,7 @@ interface PlayerState {
     queueIndex: number
     isShuffle: boolean
     repeatMode: RepeatMode
+    selectedView: MainView
 
     // Actions
     setCurrentTrack: (track: Track) => void
@@ -35,6 +62,8 @@ interface PlayerState {
     previousTrack: () => void
     toggleShuffle: () => void
     cycleRepeatMode: () => void
+
+    setSelectedView: (view: MainView) => void
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
@@ -48,6 +77,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     queueIndex: -1,
     isShuffle: false,
     repeatMode: 'off',
+    selectedView: { type: 'GENRE' } as MainView,
 
     // Actions
     setCurrentTrack: (track: Track) => set({ currentTrack: track, currentTime: 0 }),
@@ -111,5 +141,6 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
             const currentIndex = modes.indexOf(state.repeatMode)
             const nextMode = modes[(currentIndex + 1) % modes.length]
             return { repeatMode: nextMode }
-        })
+        }),
+    setSelectedView: (view: MainView) => set({ selectedView: view }),
 }))
