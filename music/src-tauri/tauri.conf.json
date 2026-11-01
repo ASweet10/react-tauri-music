@@ -13,14 +13,14 @@
     "windows": [
       {
         "title": "Owldio",
-        "width": 800,
-        "height": 600,
+        "width": 1280,
+        "height": 1020,
         "resizable": true,
         "fullscreen": false
       }
     ],
     "security": {
-      "csp": null
+      "csp": "default-src 'self'; asset: 'self'; img-src 'self' asset: https:;"
     }
   },
   "bundle": {

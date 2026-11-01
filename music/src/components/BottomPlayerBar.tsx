@@ -19,9 +19,9 @@ export const BottomPlayerBar: React.FC = () => {
     const previousTrack = usePlayerStore((state) => state.previousTrack)
 
   return (
-    <footer className="h-20 bg-black border-t border-neutral-800 px-4 flex items-center justify-between">
+    <footer className="h-20 bg-black border-t border-neutral-800 flex items-center justify-between">
         {/* Track Info */}
-        <div className="flex gap-3 w-1/5 bg-red-950">
+        <div className="flex gap-3 w-1/5 bg-blue-950">
             <img src={currentTrack?.coverArtUrl} alt="" className='object-contain w-10'/>
             <div className='flex flex-col items-start'>
                 <h1 className='text-sm font-bold'>{currentTrack?.title || ''}</h1>

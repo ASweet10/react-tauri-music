@@ -10,9 +10,7 @@
     "dialog:default",
     "dialog:allow-open",
     "core:path:default",
-    "core:event:default",
-    "sql:default",
-    "sql:allow-execute"
+    "core:event:default"
   ],
   "app": {
     "security": {

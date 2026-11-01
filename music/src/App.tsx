@@ -1,10 +1,9 @@
 
 import { BottomPlayerBar } from './components/BottomPlayerBar'
-import CenterPane from './components/CenterPane'
-import LeftSidebar from './components/LeftSidebar'
-import RightSidebar from './components/RightSidebar'
+import { CenterPane } from './components/CenterPane'
+import { LeftSidebar } from './components/LeftSidebar'
+import { RightSidebar } from './components/RightSidebar'
 import { useHydrateLibrary } from './hooks/useHydrateLibrary'
-import coolcat from './assets/coolcat.jpg'
 
 export default function App() {
   const { isLoading } = useHydrateLibrary()

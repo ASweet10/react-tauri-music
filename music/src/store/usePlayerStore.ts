@@ -31,7 +31,8 @@ export interface Track {
     artist: string
     album: string
     genre: string
-    duration: number
+    duration: number // seconds
+    fileSize: number // bytes
     filePathOrUrl: string
     coverArtUrl?: string
 }
@@ -39,47 +40,68 @@ export interface Track {
 export type RepeatMode = 'off' | 'all' | 'one'
 
 interface PlayerState {
-    // State
+    // Data State
+    musicLibrary: Track[] // All tracks scanned from SQLite
+    playbackQueue: Track[] // Temporary playlist / queue
+    queueIndex: number
     currentTrack: Track | null
+    selectedView: MainView
+
+    // Playback State
     isPlaying: boolean
+    isShuffle: boolean
     volume: number
     isMuted: boolean
     currentTime: number
-    queue: Track[]
-    queueIndex: number
-    isShuffle: boolean
     repeatMode: RepeatMode
-    selectedView: MainView
 
     // Actions
+    setMusicLibrary: (tracks: Track[]) => void
+    setPlaybackQueue: (tracks: Track[], initialIndex?: number) => void
+    addToPlaybackQueue: (track: Track) => void // "Queue Last"
+    setSelectedView: (view: MainView) => void
     setCurrentTrack: (track: Track) => void
+
     togglePlay: () => void
     setVolume: (volume: number) => void
     toggleMute: () => void
     setCurrentTime: (time: number) => void
-    setQueue: (tracks: Track[], initialIndex?: number) => void
     nextTrack: () => void
     previousTrack: () => void
     toggleShuffle: () => void
     cycleRepeatMode: () => void
-
-    setSelectedView: (view: MainView) => void
 }
 
 export const usePlayerStore = create<PlayerState>((set, get) => ({
     // Initial state
+    musicLibrary: [],
+    playbackQueue: [],
+    queueIndex: -1,
     currentTrack: null,
+    selectedView: { type: 'GENRE' } as MainView,
+
     isPlaying: false,
+    isShuffle: false,
     volume: 0.8,
     isMuted: false,
     currentTime: 0,
-    queue: [],
-    queueIndex: -1,
-    isShuffle: false,
     repeatMode: 'off',
-    selectedView: { type: 'GENRE' } as MainView,
+
 
     // Actions
+    setMusicLibrary: (tracks: Track[]) => set({ musicLibrary: tracks }),
+    setPlaybackQueue: (tracks: Track[], initialIndex = 0) => 
+        set({
+            playbackQueue: tracks,
+            queueIndex: initialIndex,
+            currentTrack: tracks[initialIndex] || null,
+            currentTime: 0
+        }),
+    addToPlaybackQueue: (track: Track) => 
+        set((state) => ({
+            playbackQueue: [...state.playbackQueue, track],
+            currentTrack: state.currentTrack || track, // Play immediately if queue empty
+        })),
     setCurrentTrack: (track: Track) => set({ currentTrack: track, currentTime: 0 }),
     togglePlay: () => set((state) => ({ isPlaying: !state.isPlaying })),
     setVolume: (volume: number) => set({ volume, isMuted: volume === 0 }),
@@ -87,15 +109,15 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
     setCurrentTime: (time: number) => set({ currentTime: time }),
     setQueue: (tracks: Track[], initialIndex = 0) =>
         set({
-            queue: tracks,
+            playbackQueue: tracks,
             queueIndex: initialIndex,
             currentTrack: tracks[initialIndex] || null,
             currentTime: 0,
         }),
     nextTrack: () => {
-        const { queue, queueIndex, isShuffle, repeatMode } = get()
+        const { playbackQueue, queueIndex, isShuffle, repeatMode } = get()
         // No other tracks in queue
-        if (queue.length === 0) {
+        if (playbackQueue.length === 0) {
             return
         }
         // Restart current song
@@ -107,20 +129,20 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         let nextIndex = queueIndex + 1
         if (isShuffle) {
             // Get random track
-            nextIndex = Math.floor(Math.random() * queue.length)
-        } else if (nextIndex >= queue.length) {
+            nextIndex = Math.floor(Math.random() * playbackQueue.length)
+        } else if (nextIndex >= playbackQueue.length) {
             // Last index & repeat all on => 0. Else => current index
             nextIndex = repeatMode === 'all' ? 0 : queueIndex
         }
 
         set({
             queueIndex: nextIndex,
-            currentTrack: queue[nextIndex] || null,
+            currentTrack: playbackQueue[nextIndex] || null,
             currentTime: 0,
         })
     },
     previousTrack: () => {
-        const { queue, queueIndex, currentTime } = get()
+        const { playbackQueue, queueIndex, currentTime } = get()
         // Less than 3 seconds in => Restart
         if (currentTime > 3) {
             set({ currentTime: 0 })
@@ -130,7 +152,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
         const prevIndex = queueIndex > 0 ? queueIndex - 1 : 0
         set({
             queueIndex: prevIndex,
-            currentTrack: queue[prevIndex] || null,
+            currentTrack: playbackQueue[prevIndex] || null,
             currentTime: 0,
         })
     },

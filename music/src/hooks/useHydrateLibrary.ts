@@ -4,7 +4,7 @@ import { usePlayerStore } from '../store/usePlayerStore';
 
 export function useHydrateLibrary() {
   const [isLoading, setIsLoading] = useState(true);
-  const setQueue = usePlayerStore((state) => state.setQueue);
+  const setQueue = usePlayerStore((state) => state.setPlaybackQueue);
 
   useEffect(() => {
     async function loadStoredLibrary() {
