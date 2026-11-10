@@ -19,14 +19,14 @@ export const LeftSidebar: React.FC = () => {
 
       if (existing) {
         existing.trackCount += 1;
-        if (!existing.coverArtUrl && track.coverArtUrl) {
-          existing.coverArtUrl = track.coverArtUrl;
+        if (!existing.coverArtUrl && track.coverPath) {
+          existing.coverArtUrl = track.coverPath;
         }
       } else {
         map.set(genreName, {
           name: genreName,
           trackCount: 1,
-          coverArtUrl: track.coverArtUrl,
+          coverArtUrl: track.coverPath,
         });
       }
     }
@@ -70,7 +70,7 @@ export const LeftSidebar: React.FC = () => {
               )}
             </div>
 
-            <div className="truncate">
+            <div className="truncate flex flex-col items-start">
               <div className="text-sm truncate">{genre.name}</div>
               <div className="text-xs text-neutral-500">{genre.trackCount} tracks</div>
             </div>

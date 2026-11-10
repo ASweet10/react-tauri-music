@@ -1,12 +1,16 @@
 // src/components/CenterView.tsx
-import React, { useMemo } from 'react'
-import { usePlayerStore } from '../store/usePlayerStore'
+import React, { use, useMemo } from 'react'
+import { usePlayerStore, type Track } from '../store/usePlayerStore'
 import { formatBytes, formatTotalDuration } from '../utils/formatters'
+import { convertFileSrc } from '@tauri-apps/api/core'
 
 export const CenterPane: React.FC = () => {
   const queue = usePlayerStore((state) => state.playbackQueue)
-  const selectedView = usePlayerStore((state) => state.selectedView)
-  const setQueue = usePlayerStore((state) => state.setPlaybackQueue)
+  const selectedView = usePlayerStore((state) => state.selectedView) 
+  //const setQueue = usePlayerStore((state) => state.setPlaybackQueue)
+  const togglePlay = usePlayerStore((state) => state.togglePlay)
+  const isPlaying = usePlayerStore((state) => state.isPlaying)
+  const setCurrentTrack = usePlayerStore((state) => state.setCurrentTrack)
 
   // Filter tracks based on current selectedView
   const filteredTracks = useMemo(() => {
@@ -18,7 +22,7 @@ export const CenterPane: React.FC = () => {
 
   // Aggregate stats (Track count, Duration, File size)
   const stats = useMemo(() => {
-    const totalBytes = filteredTracks.reduce((acc, t) => acc + (t.fileSize || 0), 0)
+    const totalBytes = filteredTracks.reduce((acc, t) => acc + (t.file_size || 0), 0)
     const totalSeconds = filteredTracks.reduce((acc, t) => acc + (t.duration || 0), 0)
 
     return {
@@ -30,15 +34,15 @@ export const CenterPane: React.FC = () => {
 
   const viewTitle =
     selectedView.type === 'GENRE' ? selectedView.genreName : 'All Tracks'
-  const representativeArt = filteredTracks.find((t) => t.coverArtUrl)?.coverArtUrl
+  const representativeArt = (filteredTracks.find((t) => t.coverPath)?.coverPath)
 
   return (
     <main className="flex-1 bg-neutral-900 rounded-lg overflow-y-auto flex flex-col m-2">
       {/* Featured Header Banner */}
-      <div className="p-8 flex items-end gap-6 bg-gradient-to-b from-indigo-900/40 to-transparent">
-        <div className="w-44 h-44 bg-neutral-800 rounded-md border border-neutral-700 shadow-2xl overflow-hidden flex-shrink-0 flex items-center justify-center">
+      <div className="p-8 flex items-end gap-6 bg-linear-to-b from-indigo-900/40 to-transparent">
+        <div className="w-44 h-44 bg-neutral-800 rounded-md border border-neutral-700 shadow-2xl overflow-hidden shrink-0 flex items-center justify-center">
           {representativeArt ? (
-            <img src={representativeArt} alt={viewTitle} className="w-full h-full object-cover" />
+            <img src={convertFileSrc(representativeArt)} alt={viewTitle} className="w-full h-full object-cover" />
           ) : (
             <span className="text-4xl text-neutral-600 font-black">
               {viewTitle?.substring(0, 1)}
@@ -73,14 +77,17 @@ export const CenterPane: React.FC = () => {
             {filteredTracks.map((track, idx) => (
               <tr
                 key={track.id}
-                onDoubleClick={() => setQueue(filteredTracks, idx)}
+                onDoubleClick={() => {
+                  setCurrentTrack(track);
+                  !isPlaying && togglePlay();
+                }}
                 className="hover:bg-neutral-800/60 cursor-pointer rounded transition"
               >
                 <td className="p-2 text-neutral-500">{idx + 1}</td>
                 <td className="p-2 text-white font-medium">{track.title}</td>
                 <td className="p-2">{track.artist}</td>
                 <td className="p-2">{track.album}</td>
-                <td className="p-2 text-xs text-neutral-500">{formatBytes(track.fileSize)}</td>
+                <td className="p-2 text-xs text-neutral-500">{formatBytes(track.file_size)}</td>
               </tr>
             ))}
           </tbody>

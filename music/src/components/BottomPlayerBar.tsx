@@ -1,4 +1,4 @@
-import { Play, Pause, SkipForward, SkipBack, Shuffle, MoveRight, Star, AudioLines, Maximize, Minimize2, Repeat, Repeat1, RepeatOff } from 'lucide-react'
+import { Play, Pause, SkipForward, SkipBack, Shuffle, MoveRight, AudioLines, Repeat, Repeat1, RepeatOff } from 'lucide-react'
 import { VolumeSlider } from './VolumeSlider'
 import { usePlayerStore } from '../store/usePlayerStore'
 import { useAudioPlayer } from '../hooks/useAudioPlayer'
@@ -21,17 +21,17 @@ export const BottomPlayerBar: React.FC = () => {
   return (
     <footer className="h-20 bg-black border-t border-neutral-800 flex items-center justify-between">
         {/* Track Info */}
-        <div className="flex gap-3 w-1/5 bg-blue-950">
-            <img src={currentTrack?.coverArtUrl} alt="" className='object-contain w-10'/>
-            <div className='flex flex-col items-start'>
+        <div className="flex gap-2 w-1/5 bg-black h-full">
+            <img src={currentTrack?.coverPath} alt="" className='object-contain w-20 p-1'/>
+            <div className='flex flex-col items-start justify-center'>
                 <h1 className='text-sm font-bold'>{currentTrack?.title || ''}</h1>
-                <h2 className='text-xs'>{currentTrack?.artist || ''}</h2>
+                <h2 className='text-sm'>{currentTrack?.artist || ''}</h2>
                 <h2 className='text-xs'>{currentTrack?.album || ''}</h2>
             </div>
         </div>
 
         {/* Playback Controls */}
-        <div className="flex h-full items-center justify-evenly w-3/5 bg-green-950">
+        <div className="flex h-full items-center justify-evenly w-3/5 bg-black">
             <audio
                 ref={audioPlayer.audioRef}
             />
@@ -44,15 +44,17 @@ export const BottomPlayerBar: React.FC = () => {
                 }
                 <SkipForward className='cursor-pointer hover:text-primary' onClick={nextTrack}/>
             </div>
+            {/*
             <div className='flex text-sm gap-2'>
                 <div>Time {currentTime}</div>
                 <div>Rep {repeatMode}</div>
                 <div>Shuf {isShuffle.toString()}</div>
                 <div>Play {isPlaying.toString()}</div>
             </div>
+            */}
         </div>
         
-        <div className='flex items-center justify-evenly w-1/5 bg-orange-950 h-full'>
+        <div className='flex items-center justify-evenly w-1/5 bg-black h-full'>
             <div className='flex gap-3'>
                 <AudioLines size={18} className='cursor-pointer hover:text-primary' />
                 {

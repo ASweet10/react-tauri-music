@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react"
 import { usePlayerStore } from "../store/usePlayerStore"
+import { convertFileSrc } from "@tauri-apps/api/core"
 
 export function useAudioPlayer() {
     const audioRef = useRef<HTMLAudioElement | null>(null)
@@ -44,10 +45,19 @@ export function useAudioPlayer() {
             return
         }
 
-        if (audio.src !== currentTrack.filePathOrUrl) {
-            audio.src = currentTrack.filePathOrUrl
+        if (audio.src !== currentTrack.file_path) {
+            audio.src = currentTrack.file_path
+
+            // Convert local path to Tauri-compatible asset URL
+            const assetUrl = convertFileSrc(currentTrack.file_path);
+            audio.src = assetUrl;
+
             if (isPlaying) {
-                audio.play().catch((err) => console.error('Playback error:', err))
+                audio.play().catch((err) => {
+                    if (err.name !== 'AbortError') {
+                        console.error('Playback error:', err)
+                    }
+                })
             }
         }
     }, [currentTrack])
@@ -58,9 +68,16 @@ export function useAudioPlayer() {
         if (!audio || !currentTrack) {
             return
         }
-
+        // Convert local path to Tauri-compatible asset URL
+        const assetUrl = convertFileSrc(currentTrack.file_path);
+        audio.src = assetUrl;
+        
         if (isPlaying) {
-            audio.play().catch((err) => console.error('Playback error:', err))
+            audio.play().catch((err) => {
+                if (err.name !== 'AbortError') {
+                    console.error('Playback error:', err)
+                }
+            })
         } else {
             audio.pause()
         }

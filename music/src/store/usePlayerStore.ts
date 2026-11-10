@@ -32,9 +32,9 @@ export interface Track {
     album: string
     genre: string
     duration: number // seconds
-    fileSize: number // bytes
-    filePathOrUrl: string
-    coverArtUrl?: string
+    file_size: number // bytes
+    file_path: string
+    coverPath?: string
 }
 
 export type RepeatMode = 'off' | 'all' | 'one'

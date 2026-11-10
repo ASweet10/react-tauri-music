@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS tracks (
     genre TEXT NOT NULL DEFAULT 'Unknown Genre',
     duration INTEGER DEFAULT 0, -- in seconds
     file_size INTEGER NOT NULL,
+    cover_path TEXT,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 )
@@ -20,6 +21,16 @@ CREATE TABLE IF NOT EXISTS tracks (
 CREATE INDEX IF NOT EXISTS idx_tracks_genre ON tracks(genre)
 CREATE INDEX IF NOT EXISTS idx_tracks_artist ON tracks(artist)
 CREATE INDEX IF NOT EXISTS idx_tracks_album ON tracks(album)
+
+-- Update fields so old values don't overwrite them on rescan
+ON CONFLICT(file_path) DO UPDATE SET
+    title=excluded.title,
+    artist=excluded.artist,
+    album=excluded.album,
+    genre=excluded.genre,
+    duration=excluded.duration,
+    file_size=excluded.file_size,
+    cover_path=excluded.cover_path
 
 -- Fetch all genres
 SELECT

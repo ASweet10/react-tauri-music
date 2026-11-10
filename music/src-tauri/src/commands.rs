@@ -4,6 +4,11 @@ use rusqlite::params;
 use tauri::Manager;
 use sha2::{Sha256, Digest};
 use serde::{Serialize, Deserialize};
+use lofty::probe::Probe;
+use lofty::file::TaggedFileExt;
+use lofty::tag::Accessor;
+use lofty::file::AudioFile;
+use lofty::picture::PictureType;
 
 pub fn clean_track_title(raw_title: &str) -> String {
   raw_title.trim().to_string()
@@ -144,27 +149,82 @@ pub async fn scan_directory(app_handle: tauri::AppHandle, dir_path: String) -> R
         if entry.file_type().is_file() {
             if let Some(ext) = entry.path().extension() {
                 let ext_str = ext.to_string_lossy().to_lowercase();
-                if ["mp3", "flac", "m4a", "ogg", "wav"].contains(&ext_str.as_str()) {
+                if ["mp3", "flac", "m4a", "ogg", "wav", "aiff"].contains(&ext_str.as_str()) {
                     let file_path = entry.path().to_string_lossy().to_string();
                     let file_name = entry.file_name().to_string_lossy().to_string();
                     let file_size = entry.metadata().map(|m| m.len()).unwrap_or(0);
 
-                    let title = file_name.clone();
-                    let artist = "Unknown Artist".to_string();
-                    let album = "Unknown Album".to_string();
-                    let genre = "Unknown Genre".to_string();
-                    let duration = 180; // Placeholder
+                    // Extract clean title without extension (e.g., "song.mp3" -> "song")
+                    let mut title = entry.path()
+                        .file_stem().
+                        and_then(|s| s.to_str())
+                        .unwrap_or("Unknown Title")
+                        .to_string();
+                    
+                    // Defaults if lofty fails to read tags
+                    let mut artist = "Unknown Artist".to_string();
+                    let mut album = "Unknown Album".to_string();
+                    let mut genre = "Unknown Genre".to_string();
+                    let mut cover_path: Option<String> = None;
+                    let mut duration: u64 = 180; // Placeholder
                     
                     // Hashing path gives unique 64-character hex string; Rescanning produces same ID, avoids duplicates
                     let mut hasher = Sha256::new();
                     hasher.update(file_path.as_bytes());
                     let id = format!("{:x}", hasher.finalize());
+                    
+                    // Read metadata
+                    if let Ok(tagged_file) = Probe::open(entry.path()).and_then(|p| p.read()) {
+                        duration = tagged_file.properties().duration().as_secs(); // Extract from audio properties
+                        
+                        if let Some(tag) = tagged_file.primary_tag().or_else(|| tagged_file.tags().first()) {
+                            if let Some(t) = tag.title() { if !t.is_empty() { title = t.to_string(); }} // Try to extract from primary/first available tag
+                            if let Some(a) = tag.artist() { if !a.is_empty() { artist = a.trim().to_string(); }}
+                            if let Some(al) = tag.album() { if !al.is_empty() { album = al.trim().to_string(); }}
+                            if let Some(g) = tag.genre() { if !g.is_empty() { genre = g.trim().to_string(); }}
+
+                            
+                            // Extract embedded art
+                            let pictures = tag.pictures();
+                            let cover = pictures
+                                .iter()
+                                .find(|pic| pic.pic_type() == PictureType::CoverFront)
+                                .or_else(|| pictures.first());
+
+                            if let Some(pic) = cover {
+                                let image_bytes = pic.data();
+                                if !image_bytes.is_empty() {
+                                    let ext = match pic.mime_type() {
+                                        Some(lofty::picture::MimeType::Png) => "png",
+                                        _ => "jpg",
+                                    };
+                                    
+                                    // Create Covers directory in app_dir
+                                    let covers_dir = app_dir.join("covers");
+                                    let _ = std::fs::create_dir_all(&covers_dir);
+
+                                    // Save img file named after track hash ID
+                                    let cover_file_name = format!("{}.{}", id, ext);
+                                    let target_cover_path = covers_dir.join(cover_file_name);
+
+                                    if std::fs::write(&target_cover_path, image_bytes).is_ok() {
+                                        cover_path = Some(target_cover_path.to_string_lossy().to_string());
+                                    }
+                                }
+                            }
+                        }
+
+                    }
 
                     tx.execute(
                         "INSERT INTO tracks (id, file_path, title, artist, album, genre, duration, file_size)
                          VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
                          ON CONFLICT(file_path) DO UPDATE SET
                             title=excluded.title,
+                            artist=excluded.artist,
+                            album=excluded.album,
+                            genre=excluded.genre,
+                            duration=excluded.duration,
                             file_size=excluded.file_size",
                         params![id, file_path, title, artist, album, genre, duration as i64, file_size as i64], // Cast u64 to i64 to fix error[E0277]
                     ).map_err(|e| e.to_string())?;

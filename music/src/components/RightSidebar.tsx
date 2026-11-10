@@ -1,5 +1,6 @@
 import React from 'react'
 import { usePlayerStore } from '../store/usePlayerStore'
+import { convertFileSrc } from '@tauri-apps/api/core'
 
 export const RightSidebar: React.FC = () => {
   const currentTrack = usePlayerStore((state) => state.currentTrack)
@@ -15,8 +16,8 @@ export const RightSidebar: React.FC = () => {
       
       {/* Current Track Artwork */}
       <div className="w-full aspect-square bg-neutral-800 rounded-md border border-neutral-700 flex items-center justify-center overflow-hidden shadow-lg">
-        {currentTrack?.coverArtUrl ? (
-          <img src={currentTrack.coverArtUrl} alt={currentTrack.title} className="w-full h-full object-cover"/>
+        {currentTrack?.coverPath ? (
+          <img src={convertFileSrc(currentTrack.coverPath)} alt={currentTrack.title} className="w-full h-full object-cover"/>
         ) : (
           <>
           </>
