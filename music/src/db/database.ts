@@ -27,7 +27,7 @@ async function runMigrations(db: Database) {
         album TEXT NOT NULL DEFAULT 'Unknown Album',
         genre TEXT NOT NULL DEFAULT 'Unknown Genre',
         duration INTEGER DEFAULT 0,
-        cover_art_url TEXT,
+        cover_path TEXT,
         file_size INTEGER NOT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP

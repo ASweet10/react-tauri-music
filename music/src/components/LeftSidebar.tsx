@@ -1,6 +1,7 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react'
 import { LibrarySettingsModal } from './LibrarySettingsModal'
 import { usePlayerStore } from '../store/usePlayerStore'
+import { convertFileSrc } from '@tauri-apps/api/core'
 
 export const LeftSidebar: React.FC = () => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
@@ -14,20 +15,20 @@ export const LeftSidebar: React.FC = () => {
     const map = new Map<string, { name: string; trackCount: number; coverArtUrl?: string }>()
 
     for (const track of musicLibrary) {
-      const genreName = track.genre?.trim() || 'Unknown Genre';
-      const existing = map.get(genreName);
+      const genreName = track.genre?.trim() || 'Unknown Genre'
+      const existing = map.get(genreName)
 
       if (existing) {
         existing.trackCount += 1;
-        if (!existing.coverArtUrl && track.coverPath) {
-          existing.coverArtUrl = track.coverPath;
+        if (!existing.coverArtUrl && track.cover_path) {
+          existing.coverArtUrl = track.cover_path
         }
       } else {
         map.set(genreName, {
           name: genreName,
           trackCount: 1,
-          coverArtUrl: track.coverPath,
-        });
+          coverArtUrl: track.cover_path,
+        })
       }
     }
 
@@ -62,7 +63,7 @@ export const LeftSidebar: React.FC = () => {
             className={`flex items-center gap-3 text-white font-bold ${ isSelected ? 'bg-red-950' : ''}`}
           >
             <div className="w-12 h-12 bg-neutral-800 rounded shrink-0 flex items-center justify-center overflow-hidden border border-neutral-700">
-              {genre.coverArtUrl ? (<img src={genre.coverArtUrl} alt={genre.name} className="w-full h-full object-cover" />) 
+              {genre.coverArtUrl ? (<img src={convertFileSrc(genre.coverArtUrl)} alt={genre.name} className="w-full h-full object-cover" />) 
                 : (
                 <span className="text-xs text-neutral-500 font-bold">
                   {genre.name.substring(0, 2).toUpperCase()}

@@ -28,6 +28,7 @@ pub struct Track {
     pub genre: Option<String>,
     pub duration: Option<i64>,
     pub file_size: Option<i64>,
+    pub cover_path: Option<String>,
 }
 
 #[tauri::command]
@@ -37,7 +38,7 @@ pub async fn fetch_all_tracks(app_handle: tauri::AppHandle) -> Result<Vec<Track>
     let conn = rusqlite::Connection::open(db_path).map_err(|e| e.to_string())?;
 
     let mut stmt = conn.prepare(
-        "SELECT id, file_path, title, artist, album, genre, duration, file_size FROM tracks"
+        "SELECT id, file_path, title, artist, album, genre, duration, file_size, cover_path FROM tracks"
     ).map_err(|e| e.to_string())?;
 
     let tracks = stmt.query_map([], |row| {
@@ -50,6 +51,7 @@ pub async fn fetch_all_tracks(app_handle: tauri::AppHandle) -> Result<Vec<Track>
             genre: row.get(5)?,
             duration: row.get(6)?,
             file_size: row.get(7)?,
+            cover_path: row.get(8)?,
         })
     }).map_err(|e| e.to_string())?
       .filter_map(|r| r.ok())
@@ -137,10 +139,14 @@ pub async fn scan_directory(app_handle: tauri::AppHandle, dir_path: String) -> R
             album TEXT,
             genre TEXT,
             duration INTEGER,
-            file_size INTEGER
+            file_size INTEGER,
+            cover_path TEXT
         )",
         [],
     ).map_err(|e| e.to_string())?;
+
+    // SAFETY CHECK: Automatically add 'cover_path' if upgrading from an older schema version
+    let _ = conn.execute("ALTER TABLE tracks ADD COLUMN cover_path TEXT", []);
 
     let tx = conn.transaction().map_err(|e| e.to_string())?;
     let mut scanned_count = 0;
@@ -209,6 +215,9 @@ pub async fn scan_directory(app_handle: tauri::AppHandle, dir_path: String) -> R
 
                                     if std::fs::write(&target_cover_path, image_bytes).is_ok() {
                                         cover_path = Some(target_cover_path.to_string_lossy().to_string());
+                                        println!("Successfully saved cover art to: {:?}", target_cover_path); // ADD THIS
+                                    } else {
+                                        println!("Failed to write cover art file for ID: {}", id); // ADD THIS
                                     }
                                 }
                             }
@@ -217,16 +226,17 @@ pub async fn scan_directory(app_handle: tauri::AppHandle, dir_path: String) -> R
                     }
 
                     tx.execute(
-                        "INSERT INTO tracks (id, file_path, title, artist, album, genre, duration, file_size)
-                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+                        "INSERT INTO tracks (id, file_path, title, artist, album, genre, duration, file_size, cover_path)
+                         VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9)
                          ON CONFLICT(file_path) DO UPDATE SET
                             title=excluded.title,
                             artist=excluded.artist,
                             album=excluded.album,
                             genre=excluded.genre,
                             duration=excluded.duration,
-                            file_size=excluded.file_size",
-                        params![id, file_path, title, artist, album, genre, duration as i64, file_size as i64], // Cast u64 to i64 to fix error[E0277]
+                            file_size=excluded.file_size,
+                            cover_path=excluded.cover_path",
+                        params![id, file_path, title, artist, album, genre, duration as i64, file_size as i64, cover_path], // Cast u64 to i64 to fix error[E0277]
                     ).map_err(|e| e.to_string())?;
 
                     scanned_count += 1;

@@ -37,7 +37,7 @@ SELECT
     COALESCE(NULLIF(genre, ''), 'Unknown Genre') as name,
     COUNT(DISTINCT album) AS albumCount,
     COUNT(id) AS trackCount,
-    MAX(cover_art_url) AS coverArtUrl
+    MAX(cover_path) AS cover_path
 FROM tracks
 GROUP BY COALESCE(NULLIF(genre, ''), 'Unknown Genre')
 ORDER BY name ASC
@@ -46,7 +46,7 @@ ORDER BY name ASC
 SELECT
     COALESCE(NULLIF(artist, ''), 'Unknown Artist') as name,
     COUNT(DISTINCT album) AS albumCount,
-    MAX(cover_art_url) AS coverArtUrl
+    MAX(cover_path) AS cover_path
 FROM tracks
 GROUP BY COALESCE(NULLIF(artist, ''), 'Unknown Artist')
 ORDER BY name ASC
@@ -55,7 +55,7 @@ ORDER BY name ASC
 SELECT
     COALESCE(NULLIF(album, ''), 'Unknown Album') as name,
     COALESCE(NULLIF(genre, ''), 'Unknown Genre') as genre,
-    MAX(cover_art_url) AS coverArtUrl
+    MAX(cover_path) AS cover_path
 FROM tracks
 GROUP BY COALESCE(NULLIF(album, ''), 'Unknown Album'), COALESCE(NULLIF(artist, '')),
 ORDER BY name ASC

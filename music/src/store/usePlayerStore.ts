@@ -12,17 +12,17 @@ export interface GenreSummary {
     name: string
     albumCount: number
     trackCount: number
-    coverArtUrl?: string
+    cover_path?: string
 }
 export interface AlbumSummary {
     name: string
     genre: string
-    coverArtUrl?: string
+    cover_path?: string
 }
 export interface ArtistSummary {
     name: string
     albumCount: number
-    coverArtUrl?: string
+    cover_path?: string
 }
 
 export interface Track {
@@ -34,7 +34,7 @@ export interface Track {
     duration: number // seconds
     file_size: number // bytes
     file_path: string
-    coverPath?: string
+    cover_path?: string
 }
 
 export type RepeatMode = 'off' | 'all' | 'one'

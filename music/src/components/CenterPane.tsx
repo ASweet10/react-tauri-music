@@ -1,8 +1,8 @@
-// src/components/CenterView.tsx
-import React, { use, useMemo } from 'react'
-import { usePlayerStore, type Track } from '../store/usePlayerStore'
+import React, { useMemo } from 'react'
+import { usePlayerStore } from '../store/usePlayerStore'
 import { formatBytes, formatTotalDuration } from '../utils/formatters'
 import { convertFileSrc } from '@tauri-apps/api/core'
+import { Heart } from 'lucide-react'
 
 export const CenterPane: React.FC = () => {
   const queue = usePlayerStore((state) => state.playbackQueue)
@@ -34,7 +34,7 @@ export const CenterPane: React.FC = () => {
 
   const viewTitle =
     selectedView.type === 'GENRE' ? selectedView.genreName : 'All Tracks'
-  const representativeArt = (filteredTracks.find((t) => t.coverPath)?.coverPath)
+  const representativeArt = (filteredTracks.find((t) => t.cover_path)?.cover_path)
 
   return (
     <main className="flex-1 bg-neutral-900 rounded-lg overflow-y-auto flex flex-col m-2">
@@ -70,7 +70,8 @@ export const CenterPane: React.FC = () => {
               <th className="p-2">Title</th>
               <th className="p-2">Artist</th>
               <th className="p-2">Album</th>
-              <th className="p-2 w-24">Size</th>
+              <th className="p-2">Duration</th>
+              <th className="p-2 w-12">Love</th>
             </tr>
           </thead>
           <tbody>
@@ -81,13 +82,17 @@ export const CenterPane: React.FC = () => {
                   setCurrentTrack(track);
                   !isPlaying && togglePlay();
                 }}
-                className="hover:bg-neutral-800/60 cursor-pointer rounded transition"
+                className="hover:bg-neutral-800/60 cursor-pointer rounded transition gap-1"
               >
-                <td className="p-2 text-neutral-500">{idx + 1}</td>
+                {/* <td className="p-2 text-neutral-500">{idx + 1}</td> */}
+                <td className="h-10 w-10 object-contain">
+                  <img src={track.cover_path ? convertFileSrc(track.cover_path) : ''} alt={viewTitle} className="w-full h-full object-cover" />
+                </td>
                 <td className="p-2 text-white font-medium">{track.title}</td>
                 <td className="p-2">{track.artist}</td>
                 <td className="p-2">{track.album}</td>
-                <td className="p-2 text-xs text-neutral-500">{formatBytes(track.file_size)}</td>
+                <td className="p-2 text-center">{ Math.floor(track.duration / 60)}:{String(track.duration % 60).padStart(2, '0')}</td>
+                <td className="p-2 w-12"><Heart /></td>
               </tr>
             ))}
           </tbody>

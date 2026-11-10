@@ -2,6 +2,7 @@ import { Play, Pause, SkipForward, SkipBack, Shuffle, MoveRight, AudioLines, Rep
 import { VolumeSlider } from './VolumeSlider'
 import { usePlayerStore } from '../store/usePlayerStore'
 import { useAudioPlayer } from '../hooks/useAudioPlayer'
+import { convertFileSrc } from '@tauri-apps/api/core'
 
 export const BottomPlayerBar: React.FC = () => {
     const audioPlayer = useAudioPlayer()
@@ -22,7 +23,7 @@ export const BottomPlayerBar: React.FC = () => {
     <footer className="h-20 bg-black border-t border-neutral-800 flex items-center justify-between">
         {/* Track Info */}
         <div className="flex gap-2 w-1/5 bg-black h-full">
-            <img src={currentTrack?.coverPath} alt="" className='object-contain w-20 p-1'/>
+            <img src={currentTrack?.cover_path ? convertFileSrc(currentTrack?.cover_path) : ''} alt="" className='object-contain w-20 p-1'/>
             <div className='flex flex-col items-start justify-center'>
                 <h1 className='text-sm font-bold'>{currentTrack?.title || ''}</h1>
                 <h2 className='text-sm'>{currentTrack?.artist || ''}</h2>
