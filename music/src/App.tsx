@@ -1,5 +1,5 @@
 
-import { BottomPlayerBar } from './components/BottomPlayerBar'
+import { BottomPlayerPane } from './components/BottomPlayerPane'
 import { CenterPane } from './components/CenterPane'
 import { LeftSidebar } from './components/LeftSidebar'
 import { RightSidebar } from './components/RightSidebar'
@@ -24,7 +24,7 @@ export default function App() {
         }
       </div>
 
-      <BottomPlayerBar />
+      <BottomPlayerPane />
     </div>
   );
 }

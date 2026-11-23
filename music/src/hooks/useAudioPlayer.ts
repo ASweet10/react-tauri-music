@@ -20,7 +20,10 @@ export function useAudioPlayer() {
         
         // Track current time
         const handleTimeUpdate = () => {
-            setCurrentTime(audio.currentTime)
+            const current = audio.currentTime
+            const total = audio.duration
+
+            setCurrentTime(current)
         }
 
         // Check if listener finished

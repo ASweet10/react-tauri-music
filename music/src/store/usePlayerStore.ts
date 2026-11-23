@@ -139,6 +139,7 @@ export const usePlayerStore = create<PlayerState>((set, get) => ({
             queueIndex: nextIndex,
             currentTrack: playbackQueue[nextIndex] || null,
             currentTime: 0,
+            isPlaying: true
         })
     },
     previousTrack: () => {
