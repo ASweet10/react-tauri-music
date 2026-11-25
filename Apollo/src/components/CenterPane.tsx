@@ -2,16 +2,22 @@ import React, { useMemo } from 'react'
 import { usePlayerStore } from '../store/usePlayerStore'
 import { formatTotalDuration } from '../utils/formatters'
 import { convertFileSrc } from '@tauri-apps/api/core'
-import { Heart } from 'lucide-react'
-import cat from '../../public/cat.webp'
+import { useLibraryStore } from '../store/useLibraryStore'
+import { GoHeart, GoHeartFill } from "react-icons/go"
+import cat from '../cat.webp'
 
 export const CenterPane: React.FC = () => {
+
+  const currentTrack = usePlayerStore((state) => state.currentTrack)
   const queue = usePlayerStore((state) => state.playbackQueue)
   const selectedView = usePlayerStore((state) => state.selectedView) 
   //const setQueue = usePlayerStore((state) => state.setPlaybackQueue)
   const togglePlay = usePlayerStore((state) => state.togglePlay)
   const isPlaying = usePlayerStore((state) => state.isPlaying)
   const setCurrentTrack = usePlayerStore((state) => state.setCurrentTrack)
+
+  const likedIds = useLibraryStore((state) => state.likedIds)
+  const toggleLike = useLibraryStore((state) => state.toggleLike)
 
   // Filter tracks based on current selectedView
   const filteredTracks = useMemo(() => {
@@ -75,7 +81,9 @@ export const CenterPane: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredTracks.map((track, idx) => (
+            {filteredTracks.map((track, idx) => {
+              const rowIsLiked = Boolean(likedIds[track.id])
+              return (
               <tr key={track.id} onDoubleClick={() => { setCurrentTrack(track); !isPlaying && togglePlay(); }}
                 className="hover:bg-neutral-800/60 cursor-pointer rounded transition"
               >
@@ -83,13 +91,18 @@ export const CenterPane: React.FC = () => {
                 <td className="h-10 w-10 object-contain">
                   <img src={track.cover_path ? convertFileSrc(track.cover_path) : cat} alt={viewTitle} className="w-full h-full object-cover" />
                 </td>
-                <td className="p-2 text-white font-medium">{track.title}</td>
-                <td className="p-2">{track.artist}</td>
-                <td className="p-2">{track.album}</td>
-                <td className="p-2 text-center">{ Math.floor(track.duration / 60)}:{String(track.duration % 60).padStart(2, '0')}</td>
-                <td className="p-2 w-12"><Heart /></td>
+                <td className="p-2 text-[13px]  text-white font-medium">{track.title}</td>
+                <td className="p-2 text-[13px] ">{track.artist}</td>
+                <td className="p-2 text-[13px] ">{track.album}</td>
+                <td className="p-2 text-[13px]  text-center">{ Math.floor(track.duration / 60)}:{String(track.duration % 60).padStart(2, '0')}</td>
+                <td className="p-2 text-[13px]  w-12">
+                  {            
+                    rowIsLiked ? <GoHeartFill size={20} className='text-red-700 cursor-pointer' onClick={(e) => { e.stopPropagation(); toggleLike(track.id)}} /> 
+                    : <GoHeart size={20} className='text-gray-400 cursor-pointer' onClick={(e) => { e.stopPropagation(); toggleLike(track.id)}} />
+                  }
+                </td>
               </tr>
-            ))}
+            )})}
           </tbody>
         </table>
       </div>

@@ -1,5 +1,5 @@
 [package]
-name = "MusicPlayer"
+name = "Apollo"
 version = "0.1.0"
 description = "A music player"
 authors = ["you"]

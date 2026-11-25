@@ -36,7 +36,7 @@ export const LeftSidebar: React.FC = () => {
   }, [musicLibrary])
 
   return (
-    <aside className="w-64 bg-neutral-900 rounded-lg flex flex-col p-3 gap-3 overflow-hidden">
+    <aside className="w-64 bg-neutral-900 rounded-lg flex flex-col p-1 overflow-hidden">
       {/* Settings */}
       <div className="w-64 bg-neutral-900 rounded-lg flex flex-col gap-4">
         <div className="flex items-center justify-between">
@@ -60,7 +60,7 @@ export const LeftSidebar: React.FC = () => {
 
         return (
           <button key={genre.name} onClick={() => setSelectedView({ type: 'GENRE', genreName: genre.name })}
-            className={`flex items-center gap-3 text-white font-bold ${ isSelected ? 'bg-red-950' : ''}`}
+            className={`flex items-center gap-3 p-2 rounded-md cursor-pointer text-white font-bold ${ isSelected ? 'bg-blue-950/60' : ''}`}
           >
             <div className="w-12 h-12 bg-neutral-800 rounded shrink-0 flex items-center justify-center overflow-hidden border border-neutral-700">
               {genre.coverArtUrl ? (<img src={convertFileSrc(genre.coverArtUrl)} alt={genre.name} className="w-full h-full object-cover" />) 

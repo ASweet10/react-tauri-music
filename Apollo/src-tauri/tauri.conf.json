@@ -1,6 +1,6 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-  "productName": "music",
+  "productName": "Apollo",
   "version": "0.1.0",
   "identifier": "com.tauri.dev",
   "build": {
@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "Owldio",
+        "title": "Apollo",
         "width": 1280,
         "height": 1020,
         "resizable": true,
